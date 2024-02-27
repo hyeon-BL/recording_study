@@ -1,13 +1,17 @@
 ## Recording Study
 Welcome to the Recording Study repository! This repository serves as a record of my study progress and learning journey. Here, I document the topics I've covered, resources I've used, and any notes or reflections I've made along the way.
 
-Table of Contents
-Introduction
+# Table of Contents
+**Introduction
+
 Topics Covered
+
 Notes
+
 Reflections
-Contributing
--
+
+Contributing**
+
 # Introduction
 
 In this repository, I aim to meticulously record my study efforts across various subjects. Whether it's programming languages, mathematics, literature, or any other topic, you'll find detailed accounts of my learning process here.
