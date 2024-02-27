@@ -2,15 +2,15 @@
 Welcome to the Recording Study repository! This repository serves as a record of my study progress and learning journey. Here, I document the topics I've covered, resources I've used, and any notes or reflections I've made along the way.
 
 # Table of Contents
-**Introduction
+**Introduction**
 
-Topics Covered
+**Topics Covered**
 
-Notes
+**Notes**
 
-Reflections
+**Reflections**
 
-Contributing**
+**Contributing**
 
 # Introduction
 
