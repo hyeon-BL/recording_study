@@ -1,0 +1,5 @@
+key1|key2|value1|value2
+one|a|1|2
+one|b|3|4
+two|a|9|10
+two|b|11|12
