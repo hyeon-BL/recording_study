@@ -4,8 +4,6 @@ Data_Structure(2-1)/Week2/week2_exercise_notebooks
 Data_Structure(2-1)/Week3
 /**/*.pdf
 /**/Week5-2_Notebooks
-/**/Week[0-9]_Notebooks
-/**/Week[0-9]_codes
-/**/Week[0-9]_examples
+/**/Week[0-9]*
 /**/HW[0-9]_*
 /**/lab[0-9]*
