@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from binary_search_tree import TreeMap
+from trees_codes.trees_codes.binary_search_tree import TreeMap
 
 class SplayTreeMap(TreeMap):
   """Sorted map implementation using a splay tree."""
