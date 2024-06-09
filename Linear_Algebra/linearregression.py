@@ -2,8 +2,8 @@ from sklearn.linear_model import LinearRegression
 import numpy as np
 
 # Create some data
-X = np.array([[-2], [-1], [0], [2]])
-Y = np.array([4, 3, 1, 0])
+X = np.array([[2], [5], [7], [8]])
+Y = np.array([1, 2, 3, 3])
 
 # Create a linear regression model
 model = LinearRegression()
