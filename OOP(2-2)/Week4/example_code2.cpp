@@ -4,21 +4,23 @@
 using namespace std;
 
 // int main() {
-//     // int* ptr3 = new int{ 40 };
-//     // delete ptr3;
-//     // *ptr3 = 10; //Error
+    // int* ptr3 = new int{ 40 };
+    // delete ptr3;
+    // *ptr3 = 10; //Error
 
-//     // int* ptr = new int{ 10 };
-//     // int* ptr2 = new int{ 20 };
-//     // *ptr = 30;
-//     // ptr = ptr2;
 
-//     // int* ptr;
-//     // while (1) {
-//     //     cout << "Hello";
-//     //     ptr = new int[100000]; //Heap allocation
-//     //     delete[] ptr;
-//     // }
+    // int* ptr = new int{ 10 };
+    // int* ptr2 = new int{ 20 };
+    // *ptr = 30;
+    // ptr = ptr2;
+
+
+    // int* ptr; 
+    // while (1) {
+    //     cout << "Hello";
+    //     ptr = new int[100000]; //Heap allocation
+    //     // delete[] ptr; //Heap deallocation(하지 않으면 memory leak)
+    // }
 
 //     int* ptr;
 //     ptr = new int[10];
@@ -39,7 +41,7 @@ using namespace std;
 // void fun(int arr[])// SAME AS void fun(int *arr)
 // {
 //     unsigned int n = sizeof(arr) / sizeof(arr[0]);
-//     cout << "Array size inside fun() is :" << n << endl; // 1 (pointer size)
+//     cout << "Array size inside fun() is :" << n << endl; // 1 (pointer size / int size)
 //     cout << "sizeof(arr)" << sizeof(arr) << endl;        // 4 (pointer size)
 //     cout << "sizeof(arr[0])" << sizeof(arr[0]) << endl;  // 4 (int size)
 // }
@@ -60,7 +62,7 @@ using namespace std;
 //     cout << "sizeof(arr)" << sizeof(arr) << endl;
 //     cout << "sizeof(arr[0])" << sizeof(arr[0]) << endl;
 //     fun(arr); //memory address of the array
-//     // fun2(arr, n); //memory address of the array + # of elements
+//     fun2(arr, n); //memory address of the array + # of elements
 //     cout << "======after fun2======" << endl;
 //     for (int i = 0; i < n; i++) {
 //         cout << arr[i] << endl;
