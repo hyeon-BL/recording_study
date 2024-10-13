@@ -9,16 +9,15 @@ using namespace std;
 //     cout << *iNums << endl; //(2) Dereferncing once : Address of the first element of the first row
 //     cout << **iNums << endl; //(3) Dereferencing twice : Value of the first element of the first row
 //     cout << &(iNums[0][0]) << endl; // Address of iNums[0][0]
-    
+//     제일 바깥쪽부터 시작해서 하나씩 빼면서 생각해보기
 //     cout << **(iNums + 1) << endl; //(4) iNums + 1 = iNums[1] = {4, 5, 6}
 //     cout << *((*iNums) + 1) << endl; //(5) iNums[0] + 1 = 2
 //     cout << *((*(iNums + 1)) + 1) << endl; //(6) iNums[1] + 1 = 5
 //     cout << *((*(iNums + 1)) + 1) + 100 << endl; //(7) 5 + 100 = 105
-
-
-
 //     return 0;
 // }
+
+
 // int main() {
 //     int iNum[3]{ 1, 2, 3 };
 //     int* pNum = iNum; // &iNum[0];
@@ -30,6 +29,8 @@ using namespace std;
 
 //     return 0;
 // }
+
+
 // int main() {
 //     int iNum = 0;
 //     int iNums[3] = { 1, 2, 3 };
@@ -44,6 +45,8 @@ using namespace std;
 
 //     return 0;
 // }
+
+
 // int main() {
 //     int studentID[][3] = { {1 }, {4, 5, 6} };
 //     cout << studentID[0][0] << endl; //1
@@ -52,6 +55,7 @@ using namespace std;
 //     cout << studentID[1][0] << endl; //4
 //     cout << studentID[1][1] << endl; //5
 //     cout << studentID[1][2] << endl; //6
+//     cout << *(*(studentID + 1) + 2) << endl; //6
 //     cout << sizeof(studentID) << endl; //4byte * 6 = 24bytes
 //     cout << sizeof(studentID[0]) << endl;//4byte * 3 = 12bytes
 //     cout << sizeof(studentID[0][0]) << endl; //4byte
@@ -60,11 +64,13 @@ using namespace std;
 //     cout << studentID[0][0] << endl; //1
 //     return 0;
 // }
+
+
 // int main() {   
 //     char str[20] = "Hello"; 
 //     char str2[] = "World"; //\0 at the end of array ([W][o][r][l][d][\0])
-//     cout << strlen(str) << endl;
-//     cout << sizeof(str) << endl; // 나머지 요소들은 \0로 채워짐
+//     cout << strlen(str) << endl; //5
+//     cout << sizeof(str) << endl; // 나머지 요소들은 \0로 채워짐(20)
 //     strncat_s(str, str2, 4); //strncat는 str에 str2를 붙이는 함수 (str, str2, 4) -> str에 str2의 4글자를 붙임
 //     cout << str << endl;
 //     if (strcmp(str, "HelloWorl") == 0) //0: same, -1: different
@@ -81,16 +87,16 @@ using namespace std;
 //     return 0;
 // }
 
+
+
 // int main() {
-
-
 //     // ¡°Hello World¡±, ¡°John¡±
 //     char name[] = "John";
 //     char name2[] = { 'J', 'o', 'h', 'n' };
-//     cout << name[0] << endl;
-//     cout << name << endl;
-//     cout << "sizeof(name)" << sizeof(name) << endl;
-//     cout << "sizeof(name2)" << sizeof(name2) << endl;
+//     cout << name[0] << endl; //J
+//     cout << name << endl; //John
+//     cout << "sizeof(name)" << sizeof(name) << endl; //5bytes
+//     cout << "sizeof(name2)" << sizeof(name2) << endl; //4bytes
   
 //     // char name[10];
 //     name[0] = 'J';
@@ -98,10 +104,11 @@ using namespace std;
 //     name[2] = 'h';
 //     name[3] = 'n';
 //     name[4] = '\0'; //end of string
-//     cout << name << endl;
+//     cout << name << endl; //John
     
 //     return 0;
 // }
+
 
 /*
 void intSwap1(int num1, int num2) {
@@ -109,13 +116,11 @@ void intSwap1(int num1, int num2) {
     num1 = num2;
     num2 = temp;
 }
-
 void intSwap2(int* num1, int* num2) {
     int temp{ *num1 };
     *num1 = *num2;
     *num2 = temp;
 }
-
 int main() {
     int iNum1{ 10 };
     int iNum2{ 30 };
@@ -128,9 +133,8 @@ int main() {
 }
 */
 
+
 // int main() {
-
-
 //     char* name{ 0 };
 //     int iNum1 = 10;
 //     int* pNum1 = &iNum1;
@@ -141,16 +145,11 @@ int main() {
 //     cout << "Pointer Value : " << *pNum1 << endl; //20
 //     cout << "Pointer Value : " << iNum1 << endl;  //20
 //     cout << "Value: " << &iNum1 << endl;          //address of iNum1
-//     cout << "Address of pNum1: " << &pNum1 << endl; //address of pNum1
+//     cout << "Address of pNum1: " << &pNum1 << endl; //address of pNum1 -> pointer's address
 //     cout << "Address of pNum1: " << &(*pNum1) << endl; //address of iNum1
 
 //     cout << "sizeof(pNum1)" << sizeof(pNum1) << endl; //4bytes (int*)
 //     cout << "sizeof(iNum1)" << sizeof(iNum1) << endl; //4bytes (int)
-
-//     //int studentID = 201911999;
-//     //cout << "address:" << &studentID << endl;
-//     //cout << "value: " << *(&studentID) << endl;
-
    
 //     return 0;
 // }
@@ -173,11 +172,12 @@ int main() {
 // using namespace CIRCLE;
 
 // int main() {
-//     //cout << CIRCLE::PI << endl;
-//     //cout << CIRCLE::calArea(1) << endl;
+//     // using namespace CIRCLE;를 선언하지 않았을 때
+//     //cout << CIRCLE::PI << endl; //3.14
+//     //cout << CIRCLE::calArea(1) << endl; //3.14
 
-//     cout << PI << endl;
-//     cout << calArea(1) << endl;
+//     cout << PI << endl; //3.14
+//     cout << calArea(1) << endl; //3.14
 //     return 0;
 // }
 
@@ -193,15 +193,16 @@ int main() {
 //     cout << iCount << endl;
 // }
 // int main() {
-//     double g_count = 1000; //Local variable
-//     int iCount = 10000; //Local variable
+//     // double g_count = 1000; //Local variable(shadowing -> global variable is not accessible)
+//     // int iCount = 10000; //Local variable
 //     counter();
 //     counter();
 //     counter();
 //     cout << g_count << endl;
-//     cout << iCount << endl; // error
+//     cout << iCount << endl; // error(static은 선언된 함수 내에서만 사용 가능)
 //     return 0;
 // }
+
 
 // long calFact(int = 0); //Default value
 // int main() {
@@ -215,28 +216,24 @@ int main() {
 //     cout << calFact() << endl; //Default value
 //     cout << "long" << sizeof(long) << endl;
 //     return 0;
-    
 // }
 // long calFact(int num) {
 //     if (num == 0) return 1;
 //     else return num * calFact(num - 1);
 // }
 
-/*
-//Function Declaration
-double calArea(int);
-void main() {
-    int iVal(0);    double dVal{ 0 };
-    cout << "Enter the radius? ";
-    cin >> iVal;
-    dVal = calArea(iVal);
-    cout << dVal << endl;
-    //return 0;
-    
-}
-double calArea(int radius) {
-    double dVal;
-    dVal = radius * radius * 3.14;
-    return dVal;
-}
-*/
+
+// double calArea(int);
+// void main() {
+//     int iVal(0);    double dVal{ 0 };
+//     cout << "Enter the radius? ";
+//     cin >> iVal;
+//     dVal = calArea(iVal);
+//     cout << dVal << endl;
+//     //return 0;
+// }
+// double calArea(int radius) {
+//     double dVal;
+//     dVal = radius * radius * 3.14;
+//     return dVal;
+// }
