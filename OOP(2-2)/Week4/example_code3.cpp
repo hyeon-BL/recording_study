@@ -4,11 +4,7 @@
 using namespace std;
 
 
-
-
-
 // class Lecture;
-
 // //Student class
 // class Student {
 // private:
@@ -127,8 +123,6 @@ using namespace std;
 
 //     cout << l2.GetName() << endl;
 //     cout << l2.getTeacherName() << endl;
-
-
 
 //     return 0;
 // }
@@ -272,11 +266,10 @@ using namespace std;
 //     ptr_many_students2 = new Student[5]; //in Heap -> Constructor 1 (5 times)
 //     cout << "==== Place 9===" << endl;
 //     for (int i = 0; i < 5; i++) {
-//         cout << (ptr_many_students2 + i)->GetName() << endl; //pointer arithmetic
-//         cout << ptr_many_students2[i].GetName() << endl;     //array notation
+//         cout << (ptr_many_students2 + i)->GetName() << endl; //pointer arithmetic(heap)
+//         cout << ptr_many_students2[i].GetName() << endl;     //array notation(stack)
 //     }
 //     cout << "==== Place 10===" << endl;
-
 
 //     delete student1; //Remove from heap -> Destructor
 //     delete student2; //Remove from heap -> Destructor
@@ -322,17 +315,15 @@ using namespace std;
 
 // int main()
 // {
-//     //const int value{ 5 }; //constant
-//     int value{ 5 }; //non-constant
+//     const int value{ 5 }; //constant
+//     // int value{ 5 }; //non-constant
 //     const int* ptr = &value;
 //     // *ptr = 6; //Dereferencing for update
 //     cout << "value: " << value << "\t*ptr" << *ptr << endl;
 
 //     const int value2 = 3;
 //     ptr = &value2;
-//     cout << "value: " << value << "\t*ptr" << *ptr << endl;
-
-   
+//     cout << "value: " << value2 << "\t*ptr" << *ptr << endl;
 
 //     return 0;
 // }
@@ -371,16 +362,6 @@ using namespace std;
 
 
 
-// void intSwap1(int  num1, int  num2) {
-//     int temp{ num1 };
-//     num1 = num2;
-//     num2 = temp;
-// }
-// void intSwap2(int* num1, int* num2) { //Pointer
-//     int temp{ *num1 };
-//     *num1 = *num2;
-//     *num2 = temp;
-// }
 // void intSwap3(int& num1, int& num2) { //Reference
 //     int temp{ num1 };
 //     num1 = num2;
@@ -403,9 +384,9 @@ using namespace std;
 // int main() {
 //     int iNum1{ 1 };
 //     int iNum2{ 3 };
-//     cout << iNum1 << " " << iNum2 << endl;
+//     cout << iNum1 << " " << iNum2 << endl; //1 3
 //     intSwap3(iNum1, iNum2);
-//     cout << iNum1 << " " << iNum2 << endl;
+//     cout << iNum1 << " " << iNum2 << endl; //3 1
 //     int* pNums = f1(); // pNums points to the array in Heap
 //     f2();
 //     f2();
