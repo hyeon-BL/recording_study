@@ -19,7 +19,6 @@ split_index = int(len(X_train) * (1 - validation_split))
 X_train, X_val = X_train[:split_index], X_train[split_index:]
 y_train, y_val = y_train[:split_index], y_train[split_index:]
 
-
 # Initialize the CNN
 network = NeuralNetwork()
 print("CNN initialized")

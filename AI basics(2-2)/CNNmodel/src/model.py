@@ -146,13 +146,14 @@ class NeuralNetwork:
 
     def forward(self, image, label):
         """Perform forward pass and return loss and accuracy"""
-        # Convert one-hot encoded label to integer
-        label_idx = np.argmax(label)
-        
         out = self.conv.forward((image / 255) - 0.5)
         out = self.pool.forward(out)
         out = self.softmax.forward(out)
 
+        # Get the correct label index
+        label_idx = np.argmax(label)
+        
+        # Calculate cross-entropy loss
         loss = -np.log(out[label_idx])
         acc = 1 if np.argmax(out) == label_idx else 0
 
@@ -160,20 +161,17 @@ class NeuralNetwork:
 
     def train(self, im, label, lr=.005):
         """Train the network on a single image"""
-        # Convert one-hot encoded label to integer
-        label_idx = np.argmax(label)
-        
-        # Forward
+        # Forward pass with full label array
         out, loss, acc = self.forward(im, label)
-
+        
         # Calculate initial gradient
         gradient = np.zeros(10)
-        gradient[label_idx] = -1/out[label_idx]
+        gradient[np.argmax(label)] = -1/out[np.argmax(label)]
 
         # Backprop
         gradient = self.softmax.backprop(gradient, lr)
-        gradient = self.pool.backprop(gradient)
-        self.conv.backprop(gradient, lr)
+        # gradient = self.pool.backprop(gradient)
+        # self.conv.backprop(gradient, lr)
 
         return loss, acc
 
@@ -238,8 +236,6 @@ class NeuralNetwork:
                 
                 if (i // batch_size) % 100 == 0:
                     print(f'Batch {i//batch_size}/{n_batches}: Loss = {batch_loss:.4f}, Accuracy = {batch_acc:.4f}')
-                elif (i // batch_size) == n_batches:
-                    print(f'Batch {i//batch_size}/{n_batches}: Loss = {batch_loss:.4f}, Accuracy = {batch_acc:.4f}\n')
             
             # Validation
             print('\n--- Validation ---')
