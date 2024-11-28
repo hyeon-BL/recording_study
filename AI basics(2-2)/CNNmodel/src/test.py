@@ -22,7 +22,11 @@ with open(os.path.join(model_path, 'ckpt.pkl'), 'rb') as f:
     network.parameters = pickle.load(f)
 
 # Make predictions
-predictions, _ = network.forward(X_test, y_test)
+predictions = []
+for i in range(len(X_test)):
+    pred, _, _ = network.forward(X_test[i], y_test[i])
+    predictions.append(pred)
+predictions = np.array(predictions)
 
 # Calculate accuracy
 accuracy = np.mean(np.argmax(predictions, axis=1) == np.argmax(y_test, axis=1))

@@ -19,13 +19,19 @@ class MNISTDataLoader:
             magic, num, rows, cols = struct.unpack(">IIII", f.read(16))
             images = np.fromfile(f, dtype=np.uint8).reshape(num, rows, cols)
         return images
+
+    def to_one_hot(self, labels):
+        """Convert labels to one-hot encoding"""
+        one_hot = np.zeros((labels.size, 10))
+        one_hot[np.arange(labels.size), labels] = 1
+        return one_hot
        
     def preprocess_data(self):
         # Process features and labels
         X_train = self.train_images  # Shape: (60000, 28, 28)
-        y_train = self.train_labels  # Shape: (60000,)
+        y_train = self.to_one_hot(self.train_labels)  # Shape: (60000, 10)
         X_test = self.test_images    # Shape: (10000, 28, 28)
-        y_test = self.test_labels    # Shape: (10000,)
+        y_test = self.to_one_hot(self.test_labels)    # Shape: (10000, 10)
         
         # Normalize pixel values to [0, 1]
         X_train = X_train / 255.0

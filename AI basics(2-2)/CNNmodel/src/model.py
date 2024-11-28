@@ -13,11 +13,17 @@ class Conv3x3:
     def forward(self, input): 
         """Vectorized forward pass using im2col"""
         self.last_input = input
-        h, w = input.shape
+        
+        # Handle both single images and batches
+        if len(input.shape) == 2: # Single image for testing
+            h, w = input.shape
+        else:
+            h, w = input.shape[1], input.shape[2] # Batch of images for training
+            
         self.last_input_col = np.lib.stride_tricks.as_strided(
             input,
             shape=(h-2, w-2, 3, 3),
-            strides=(input.strides[0], input.strides[1], input.strides[0], input.strides[1])
+            strides=(input.strides[-2], input.strides[-1], input.strides[-2], input.strides[-1])
         ).reshape(-1, 9)  # Convert to (n_positions, 9) for matrix multiplication
         
         # Reshape filters to (num_filters, 9)
