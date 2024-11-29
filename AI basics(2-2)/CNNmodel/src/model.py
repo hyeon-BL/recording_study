@@ -1,270 +1,267 @@
 import numpy as np
-import pickle
-
-class Conv3x3:
-    """3x3 Convolution layer using vectorized operations"""
-
-    def __init__(self, num_filters):
-        """Initialize filters with random values"""
-        self.num_filters = num_filters
-        self.filters = np.random.randn(num_filters, 3, 3) / np.sqrt(2 / 9)  # He initialization
 
 
-    def forward(self, input): 
-        """Vectorized forward pass using im2col"""
-        self.last_input = input
-        
-        # Handle both single images and batches
-        if len(input.shape) == 2: # Single image for testing
-            h, w = input.shape
-        else:
-            h, w = input.shape[1], input.shape[2] # Batch of images for training
-            
-        self.last_input_col = np.lib.stride_tricks.as_strided(
-            input,
-            shape=(h-2, w-2, 3, 3),
-            strides=(input.strides[-2], input.strides[-1], input.strides[-2], input.strides[-1])
-        ).reshape(-1, 9)  # Convert to (n_positions, 9) for matrix multiplication
-        
-        # Reshape filters to (num_filters, 9)
-        filters_col = self.filters.reshape(self.num_filters, -1)
-        
-        # Compute convolution as matrix multiplication
-        output = np.dot(self.last_input_col, filters_col.T)
-        
-        # Reshape output to proper dimensions (h-2, w-2, num_filters)
-        return output.reshape(h-2, w-2, self.num_filters)
+class CNN:
+    def __init__(self, tr_x, tr_y, test_x, test_y):
+        """Initialize the CNN model with training and test data"""
+        # Training & Test data
+        self.tr_x = tr_x
+        self.tr_y = tr_y
+        self.test_x = test_x
+        self.test_y = test_y
 
+        # Weight & Bias 
+        np.random.seed(5)
+        self.F1 = np.random.rand(10, 3, 3)
+        self.F2 = np.random.rand(10, 10, 3, 3)
+        self.W1 = np.random.rand(10, 196)
+        self.B1 = np.random.rand(10, 1)
+        self.B2 = np.random.rand(10, 1)
+        self.B3 = np.random.rand(10, 1)
 
-    def backprop(self, d_L_d_out, learn_rate):
-        """Vectorized backpropagation"""
-        d_L_d_out_reshaped = d_L_d_out.reshape(-1, self.num_filters)  # (n_positions, num_filters)
-        
-        # Compute gradient w.r.t. filters
-        d_L_d_filters = np.dot(d_L_d_out_reshaped.T, self.last_input_col)  # (num_filters, 9)
-        d_L_d_filters = d_L_d_filters.reshape(self.num_filters, 3, 3)
-        
-        # Update filters
-        self.filters -= learn_rate * d_L_d_filters
-        return None
+        # Add parameters property to store trained parameters
+        self.parameters = {
+            'W1': self.W1,
+            'F1': self.F1,
+            'F2': self.F2,
+            'B1': self.B1,
+            'B2': self.B2,
+            'B3': self.B3
+        }
 
 
 
-class MaxPool2:
-    """Max pooling layer using vectorized operations"""
-
-    def forward(self, input):
-        """Vectorized forward pass for max pooling"""
-        self.last_input = input
-        n_h, n_w, n_c = input.shape
-        
-        # Reshape input to perform max pooling
-        reshaped = input.reshape(n_h//2, 2, n_w//2, 2, n_c)
-        self.output = np.max(np.max(reshaped, axis=3), axis=1)
-        return self.output
-
-
-    def backprop(self, d_L_d_out):
-        """Vectorized backpropagation for max pooling"""
-        d_L_d_input = np.zeros_like(self.last_input)
-        n_h, n_w, n_c = self.last_input.shape
-        
-
-        # Create mask of where the maximum values were located
-        for c in range(n_c):
-            for i in range(0, n_h, 2):
-                for j in range(0, n_w, 2):
-                    window = self.last_input[i:i+2, j:j+2, c]
-                    max_val = np.max(window)
-                    mask = (window == max_val)
-                    d_L_d_input[i:i+2, j:j+2, c] = mask * d_L_d_out[i//2, j//2, c]
-        
-        return d_L_d_input
-
-
-
-class Softmax:
-    """Softmax classifier"""
-    def __init__(self, input_len, nodes):
-        """Initialize weights and biases"""
-        self.weights = np.random.randn(input_len, nodes) / input_len
-        self.biases = np.zeros(nodes)
-
-    def forward(self, input):
-        """Forward pass"""
-        self.last_inshape = input.shape
-
-        input = input.flatten() # Flatten the input 
-        self.last_input = input 
-
-
-        totals = np.dot(input, self.weights) + self.biases # totals = input * weights + biases
-        self.last_totals = totals
-
-        exp_a = np.exp(totals)
-        return exp_a / np.sum(exp_a, axis = 0) # Apply softmax
+    def relu(self, input):
+        """Relu activation, returns 1-D array of values between [0, inf)"""
+        return np.maximum(0.01*input, input)
     
-    def backprop(self, dL_dout, learning_rate):
-        """Backpropagation"""
-        for i, gradient in enumerate(dL_dout):
-            if gradient == 0:
-                continue
-            
-            # Sum of exps to use in backpropagation
-            exp_t = np.exp(self.last_totals)
-            S = np.sum(exp_t)
+    def softmax(self, input):
+        """Softmax activation, returns 1-D array of values between (0, 1]"""
+        input = input.T
+        for i in range(10):
+            input[i] = input[i] - input[i].max()
+            input[i] = np.exp(input[i])/np.sum(np.exp(input[i]))
+        return input.T
+    
+    def one_hot(self, index):
+        """Converts a single value to one-hot array"""
+        one_hot_array = np.zeros((1, np.max(self.tr_y) + 1))
+        one_hot_array[np.arange(1), self.tr_y[index]] = 1
 
-            # Gradient of out[i] against totals
-            dout_dt = -exp_t[i] * exp_t / (S**2)
-            dout_dt[i] = exp_t[i] * (S-exp_t[i]) / (S**2)
-            
-            # Gradients of totals against weights/biases/input
-            dt_dw = self.last_input
-            dt_db = 1
-            dt_dinputs = self.weights
+        return one_hot_array
+    
+    def cross_entropy(self, output_layer, index):
+        """Cross-entropy loss function for Softmax backpropagation"""
+        one_hot_array = self.one_hot(index)
+        return (output_layer - one_hot_array)
+    
+    def costFunction(self, output_layer, index):
+        """Cost function using (Softmax - One_hot)"""
+        return self.cross_entropy(output_layer, index)
+    
+    def unpool(self, img, size):
+        """Unpooling the image by size"""
+        img = img.reshape(-1, 14, 14)
+        x = np.repeat(img, size, axis = 2)
+        x = np.repeat(x, size, axis = 1)
+        return x/.25
+    
+    def deriv_relu(self, input):
+        """Derivative of Relu activation for backpropagation"""
+        one_like = np.ones_like(input)  # Create an array of ones with the same shape as x
+        one_like[input < 0] = .01
+        return one_like
+    
+  
 
-            # Gradients of loss against totals
-            dL_dt = gradient * dout_dt
+    
+    def im2col(self, filter_len, filter_num, img_size, stride = 1):
+        """Transform image into columns for easier matrix multiplication"""
+        #filter_len represents filter size 3 for (3, 3), filter_num represents number of filters which is 10
 
-            # Gradients of loss against weights/biases/input
-            dL_dw = dt_dw[np.newaxis].T @ dL_dt[np.newaxis]
-            dL_db = dL_dt * dt_db
-            dL_dinputs = dt_dinputs @ dL_dt
+        #Generate filter [0, ..., filter_len] and repeat for a (filter_len, filter_len) x column
+        x_vector = np.tile(np.repeat(np.arange(filter_len) , filter_len), filter_num)
+        #Generate filter [0, ..., filter_len] and tile for a (filter_len, filter_len) y column
+        y_vector = np.tile(np.tile(np.arange(filter_len) , filter_len), filter_num)
 
-            # Update weights / biases
-            self.weights -= learning_rate * dL_dw
-            self.biases -= learning_rate * dL_db
-            return dL_dinputs.reshape(self.last_inshape)
+        #Tile x column img_size*img_size times for whole image
+        x_vector = np.tile(x_vector, (int((img_size/stride)*(img_size/stride)), 1))
+        #Tile y column img_size*img_size times for whole image
+        y_vector = np.tile(y_vector, (int((img_size/stride)*(img_size/stride)), 1))
 
-class NeuralNetwork:
-    """CNN implementation with conv layer, pooling layer, and softmax"""
-    def __init__(self):
-        # Initialize network architecture
-        self.conv = Conv3x3(8)          # Conv layer with 8 filters
-        self.pool = MaxPool2()          # Pooling layer
-        self.softmax = Softmax(13 * 13 * 8, 10)  # Final classification layer
+        #Generate increasing numbers by 1 to add onto each of our x and y column
+        #(676,)
+        every_x_col = np.repeat(np.arange(int(img_size/stride)) * stride, int(img_size/stride)).reshape(-1, 1)
+        #(676,)
+        every_y_col = np.tile(np.arange(int(img_size/stride)) * stride, int(img_size/stride)).reshape(-1, 1)
 
-    def forward(self, image, label):
-        """Perform forward pass and return loss and accuracy"""
-        out = self.conv.forward((image / 255) - 0.5)
-        out = self.pool.forward(out)
-        out = self.softmax.forward(out)
+        x_vector = x_vector + every_x_col
+        y_vector = y_vector + every_y_col
 
-        # Get the correct label index
-        label_idx = np.argmax(label)
         
-        # Calculate cross-entropy loss
-        loss = -np.log(out[label_idx])
-        acc = 1 if np.argmax(out) == label_idx else 0
+        return (x_vector, y_vector)
+    
+    def col2im(self, input):
+        """Outputting N x N error onto gradient"""
+        x_pad = np.zeros((10, 30, 30))
+        input = input.T.reshape(-1, 10, 9)
+        for i in range(28):
+            for j in range(28):
+                np.add.at(x_pad, (slice(None), np.repeat(np.arange(3), 3)+i, np.tile(np.arange(3), 3)+j), input[(i*28)+j])
 
-        return out, loss, acc
+        x_pad = x_pad[:, 1:29, 1:29].reshape(-1, 784)/(np.max(np.abs(x_pad)))
+        return x_pad
 
-    def train(self, im, label, lr=.005):
-        """Train the network on a single image"""
-        # Forward pass with full label array
-        out, loss, acc = self.forward(im, label)
+    def clip_gradients(self, gradients, threshold):
+        """Gradient Clipping"""
+        total = 0
+
+        # Calculate Norm of Gradients
+        for grad in gradients:
+            total += np.sum(np.square(grad))
+        total = np.sqrt(total)
         
-        # Calculate initial gradient
-        gradient = np.zeros(10)
-        gradient[np.argmax(label)] = -1/out[np.argmax(label)]
+        # Clip Gradients with threshold
+        if total > threshold:
+            for i in range(len(gradients)):
+                gradients[i] *= threshold / total
 
-        # Backprop
-        gradient = self.softmax.backprop(gradient, lr)
-        # gradient = self.pool.backprop(gradient)
-        # self.conv.backprop(gradient, lr)
+        return gradients
 
-        return loss, acc
 
-    def compute_loss(self, y_true, y_pred):
+    def forwardfeed(self, tr_img):
+        """"Forward propagation of weights and bias"""
+        # 3 building block (Conv + Relu) -> (Conv + Relu + Pooling) -> Softmax
+        
+        # Padding from 28x28 to 30x30
+        X = tr_img.reshape(784)
+        tr_img = np.pad(tr_img, (1, 1), 'constant')
+        
+        # building block 1. (Conv + Relu)
+        x_vector, y_vector = self.im2col(3, 1, 28)
+        # (10, 9) * (9, 784) == (10, 784)
+        F1 = self.F1.reshape(10, 9)
+        cur_img = np.dot(F1, (tr_img[x_vector, y_vector].T)) + self.B1
+        Z1 = cur_img
+        cur_img = (self.relu(cur_img))
+        A1 = cur_img
+        cur_img = cur_img.reshape(-1, 28, 28)
+        
+        # building block 2. (Conv + Relu)
+        cur_img = np.pad(cur_img, ((0, 0), (1, 1), (1, 1)), 'constant')
+        x_vector, y_vector = self.im2col(3, 1, 28)
+        # (10, 10, 9) * (10, 9, 784) -> Im2col -> (10, 90) * (90, 784) == (10, 784)
+        # 10 filters is applied on (10 x 28 x 28) images
+        F2 = self.F2.reshape(-1, 90)
+        cur_img = (np.dot(F2, np.transpose(cur_img[:, x_vector, y_vector], (0, 2, 1)).reshape(90, -1)) + self.B2)
+        Z2 = cur_img
+        cur_img = (self.relu(cur_img))
+        cur_img = cur_img.reshape(-1, 28, 28)
+        A2 = cur_img
+
+        # Mean Pooling, 2x2 stride 2 
+        x_vector, y_vector = self.im2col(2, 1, 28, 2)
+        #(10, 196)
+        cur_img = np.sum(cur_img[:, x_vector, y_vector], axis = 2)/4.0
+
+
+        # building block 3. (Softmax)
+        #(10, 196) * (196, 10) = (10, 10)
+        input_1 = cur_img
+        output_1 = self.W1.dot(input_1.T) + self.B3
+        activate_1 = self.softmax(output_1)
+
+
+        return X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1
+
+    def calculate_loss(self, output, target_index):
         """Calculate cross-entropy loss"""
-        y_true = self.to_one_hot(np.argmax(y_true, axis=1) if len(y_true.shape) > 1 else y_true)
-        m = y_true.shape[0]
-        loss = -np.sum(y_true * np.log(y_pred + 1e-8)) / m
+        target = self.one_hot(target_index)
+        epsilon = 1e-15  # Small constant to avoid log(0)
+        output = np.clip(output, epsilon, 1 - epsilon)  # Clip values to avoid numerical instability
+        loss = -np.sum(target * np.log(output))
         return loss
-    
-    def compute_accuracy(self, y_true, y_pred):
-        """Calculate prediction accuracy"""
-        if len(y_true.shape) == 1:
-            y_true = self.to_one_hot(y_true)
-        if len(y_pred.shape) == 1:
-            y_pred = y_pred.reshape(1, -1)
-        return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))
-    
-    def to_one_hot(self, y):
-        """Convert integer labels to one-hot encoding"""
-        one_hot = np.zeros((y.size, y.max() + 1))
-        one_hot[np.arange(y.size), y] = 1
-        return one_hot
 
-    def fit(self, X_train, y_train, X_val, y_val, epochs=3, batch_size=64, learning_rate=0.005):
-        """Train the network on the given data"""
-        n_batches = len(X_train) // batch_size
+    def backpropagate(self, costFunc, X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1):
+        """Backpropagation of weights and bias"""
+
+        # Backpropagation of weights and bias - starting from softmax layer
+        #(10, 10) * (10, 196) = (10, 196)
+        dW1 = np.dot(costFunc.T, input_1)
+        #sum(10, 10) = (10, 1)
+        dB3 = np.sum(costFunc.T, axis=1).reshape(10, 1)
+
+        # Backpropagation of weights and bias - starting from pooling layer
+        #(10, 10) * (10, 196) = (10, 196)
+        dA2 = np.dot(costFunc.T, self.W1)
+        dA2 = dA2
+        #(10, 196) -> (10, 784)
+        dA2 = self.unpool(dA2, 2).reshape(-1, 784)
+
+        # Backpropagation of weights and bias - starting from convolution layer
+        #(10, 784) * (10, 784) = (10, 784)
+        dZ2 = dA2 * self.deriv_relu(Z2)
+        #sum (10, 784) -> (10, 1)
+        dB2 = np.sum(dZ2, axis=1).reshape(10, 1)
+        #(10, 784) * (784, 10) -> im2col -> (90, 784) * (784, 10) = (90, 10)
+        temp_dZ2 = np.pad(dZ2.reshape(-1, 28, 28), ((0, 0), (1, 1), (1, 1)), 'constant')
+        x_vector, y_vector = self.im2col(3, 1, 28)
+        dF2 = np.dot(np.transpose(temp_dZ2[:, x_vector, y_vector], (0, 2, 1)).reshape(90, -1), A1.T).T
+
+
+        # Backpropagation of weights and bias - starting from convolution layer
+        #(90, 10) * (10, 784) = (90, 784)
+        dA1 = F2.T.dot(dZ2)
+        dA1 = dA1
+        #(90, 784) -> (10, 784) by redistributing the 3x3 convolution
+        dA1 = self.col2im(dA1)
+
+
+        #(10, 784) * (10, 784) = (10, 784)
+        dZ1 = dA1 * self.deriv_relu(Z1)
+        #sum (10, 784) -> (10, 1)
+        dB1 = np.sum(dZ1, axis=1).reshape(10, 1)
+        #(10, 784) * (784) -> im2col -> (10, 784) * (784, 9) = (10, 9)
+        temp_X = np.pad(X.reshape(28,28), (1, 1), 'constant')
+        x_vector, y_vector = self.im2col(3, 1, 28)
+        dF1 = dZ1.dot(temp_X[x_vector, y_vector])
         
-        for epoch in range(epochs):
-            print(f'--- Epoch {epoch + 1}/{epochs} ---')
-            
-            # Shuffle training data
-            shuffle = np.random.permutation(len(X_train))
-            X_train = X_train[shuffle]
-            y_train = y_train[shuffle]
-            
-            total_loss = 0
-            total_acc = 0
-            
-            # Training
-            for i in range(0, len(X_train), batch_size):
-                batch_X = X_train[i:i + batch_size]
-                batch_y = y_train[i:i + batch_size]
-                
-                batch_preds = []
-                batch_loss = 0
-                batch_acc = 0
-                
-                # Process each sample in the batch
-                for im, label in zip(batch_X, batch_y):
-                    pred, loss, acc = self.forward(im, label)
-                    self.train(im, label, learning_rate)
-                    batch_preds.append(pred)
-                    batch_loss += loss
-                    batch_acc += acc
-                
-                # Average batch metrics
-                batch_loss /= len(batch_X)
-                batch_acc /= len(batch_X)
-                total_loss += batch_loss
-                total_acc += batch_acc
-                
-                if (i // batch_size) % 100 == 0:
-                    print(f'Batch {i//batch_size}/{n_batches}: Loss = {batch_loss:.4f}, Accuracy = {batch_acc:.4f}')
-            
-            # Validation
-            print('\n--- Validation ---')
-            val_preds = []
-            for im, label in zip(X_val, y_val):
-                pred, _, _ = self.forward(im, label)
-                val_preds.append(pred)
-            
-            val_preds = np.array(val_preds)
-            val_loss = self.compute_loss(y_val, val_preds)
-            val_acc = self.compute_accuracy(y_val, val_preds)
-            print(f'Validation Loss: {val_loss:.4f}, Accuracy: {val_acc:.4f}\n')
-            
-        return total_loss/n_batches, total_acc/n_batches
-    
+        #Clipping the Gradient
+        dW1, dF1, dF2, dB1, dB2, dB3 = self.clip_gradients([dW1, dF1, dF2, dB1, dB2, dB3], 5)
 
-    def save_model(self, file_path):
-        """Save the model parameters to a file"""
-        with open(file_path, 'wb') as f:
-            pickle.dump({
-                'conv_filters': self.conv.filters,
-                'softmax_weights': self.softmax.weights,
-                'softmax_biases': self.softmax.biases
-            }, f)
+        self.W1 = np.subtract(self.W1, .7*dW1)
+        self.F2 = np.subtract(self.F2, .7*dF2.reshape(-1, 10, 9).reshape(10, -1, 3, 3))
+        self.F1 = np.subtract(self.F1, .7*dF1.reshape(10, 9).reshape(-1, 3, 3))
 
-    def load_model(self, file_path):
-        """Load the model parameters from a file"""
-        with open(file_path, 'rb') as f:
-            params = pickle.load(f)
-            self.conv.filters = params['conv_filters']
-            self.softmax.weights = params['softmax_weights']
-            self.softmax.biases = params['softmax_biases']
+        self.B3 = np.subtract(self.B3, .7*dB3)
+        self.B2 = np.subtract(self.B2, .7*dB2)
+        self.B1 = np.subtract(self.B1, .7*dB1)
+
+        # Update parameters dictionary after backpropagation
+        self.parameters = {
+            'W1': self.W1,
+            'F1': self.F1,
+            'F2': self.F2,
+            'B1': self.B1,
+            'B2': self.B2,
+            'B3': self.B3
+        }
+
+        
+    def get_accuracy(self): 
+        """Calculate Accuracy of predicted labels with true labels"""
+        counter_tr = 0
+        for i in range(len(self.tr_y)):
+            X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1  = self.forwardfeed(self.tr_x[i])
+            if np.argmax(np.sum(activate_1, axis=1)) == self.tr_y[i]:
+                counter_tr += 1
+
+        counter_te = 0
+        for i in range(len(self.test_y)):
+            X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1  = self.forwardfeed(self.test_x[i])
+            if np.argmax(np.sum(activate_1, axis=1)) == self.test_y[i]:
+                counter_te += 1
+
+        return (counter_tr/self.tr_y.size, counter_te/self.test_y.size)
+
+
