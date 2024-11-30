@@ -5,6 +5,7 @@ class MNISTDataLoader:
     def __init__(self, file_path):
         self.file_path = file_path
 
+    # Load data from MNIST dataset(ubyte format)
     def load_data(self, tr_label_file, tr_image_file, te_label_file, te_image_file):
         with open(tr_label_file, "rb") as file:
             magic, size = struct.unpack(">II", file.read(8))

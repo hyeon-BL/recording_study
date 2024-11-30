@@ -6,7 +6,7 @@ class Conv3x3:
     def __init__(self, num_filters):
         """Initialize filters with random values"""
         self.num_filters = num_filters
-        self.filters = np.random.randn(num_filters, 3, 3) / np.sqrt(2 / 9)  # He initialization
+        self.filters = np.random.randn(num_filters, 3, 3) / np.sqrt(2 / 9)  # He initialization to prevent vanishing gradients
     
     
     def forward(self, input): 
@@ -101,6 +101,7 @@ class Softmax:
         
 class CNN:
     def __init__(self):
+        """Buiding block(convolution, pooling, softmax)"""
         self.conv = Conv3x3(8)
         self.pool = MaxPool2()
         self.softmax = Softmax(13 * 13 * 8, 10)
@@ -122,7 +123,8 @@ class CNN:
         self.softmax.biases = params['softmax_biases']
 
     def forward(self, image, label):
-        out = self.conv.forward((image / 255) - 0.5)
+        """Forward pass"""
+        out = self.conv.forward((image / 255) - 0.5) # Normalize pixel values to [-0.5, 0.5]
         out = self.pool.forward(out)
         out = self.softmax.forward(out)
 
@@ -131,20 +133,21 @@ class CNN:
 
         return out, loss, acc
 
-    def train(self, im, label, lr = .005):
-        # Forward
+    def train(self, im, label, lr):
+        """Train the model"""
+        # Forward pass
         out, loss, acc = self.forward(im, label)
 
         # Calculate initial gradient
         gradient = np.zeros(10)
-        gradient[label] = -1/out[label]
+        gradient[label] = -1/out[label] # Derivative of cross-entropy loss written in terms of softmax output
 
-        # Backprop
+        # Backpropagate gradient
         gradient = self.softmax.backprop(gradient, lr)
 
         # Clip the gradient to prevent exploding gradients
         np.clip(gradient, -1, 1, out=gradient)
-        
+
         return loss, acc
 
     def test(self, images, labels):
@@ -155,7 +158,7 @@ class CNN:
             out, l, acc = self.forward(im, label)
             loss += l
             num_correct += acc
-        return loss / len(images), num_correct / len(images) * 100
+        return loss / len(images), num_correct / len(images) * 100 # Return loss and accuracy
     
     def save(self, path):
         """Save model parameters"""

@@ -45,6 +45,6 @@ for epoch in range(epochs):
 
 
 # Save model after all epochs
-save_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ckpt.pkl')
+save_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ckpt/ckpt.pkl')
 cnn.save(save_path)
 print(f"Model saved to {save_path}")
