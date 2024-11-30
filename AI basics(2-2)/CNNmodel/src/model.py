@@ -1,5 +1,5 @@
 import numpy as np
-
+import pickle
 class Conv3x3:
     """3x3 Convolution layer using vectorized operations"""
 
@@ -100,9 +100,26 @@ class Softmax:
             return dL_dinputs.reshape(self.last_inshape)
         
 class CNN:
-    conv = Conv3x3(8)
-    pool = MaxPool2()
-    softmax = Softmax(13 * 13 * 8, 10)
+    def __init__(self):
+        self.conv = Conv3x3(8)
+        self.pool = MaxPool2()
+        self.softmax = Softmax(13 * 13 * 8, 10)
+
+    @property
+    def parameters(self):
+        """Get model parameters for saving"""
+        return {
+            'conv_filters': self.conv.filters,
+            'softmax_weights': self.softmax.weights,
+            'softmax_biases': self.softmax.biases
+        }
+    
+    @parameters.setter
+    def parameters(self, params):
+        """Restore model parameters from saved state"""
+        self.conv.filters = params['conv_filters']
+        self.softmax.weights = params['softmax_weights']
+        self.softmax.biases = params['softmax_biases']
 
     def forward(self, image, label):
         out = self.conv.forward((image / 255) - 0.5)
@@ -136,3 +153,8 @@ class CNN:
             loss += l
             num_correct += acc
         return loss / len(images), num_correct / len(images) * 100
+    
+    def save(self, path):
+        """Save model parameters"""
+        with open(path, 'wb') as f:
+            pickle.dump(self.parameters, f)

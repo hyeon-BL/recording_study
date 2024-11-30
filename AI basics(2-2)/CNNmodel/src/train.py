@@ -14,7 +14,7 @@ epochs = 3
 learning_rate = .005
 
 
-print("MNIST CNN initialized!")
+print("CNN initialized!")
 train_loss = 0
 train_correct = 0
 
@@ -32,3 +32,9 @@ for i, (im, label) in enumerate(zip(train_images, train_labels)):
     l, acc = cnn.train(im, label, learning_rate)
     train_loss += l
     train_correct += acc
+
+
+# Save model after training
+save_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ckpt.pkl')
+cnn.save(save_path)
+print(f"Model saved to {save_path}")
