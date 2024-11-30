@@ -5,7 +5,7 @@ import os
         
 # Load and preprocess data
 data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'dataset')
-X_train, Y_train, _, _ = MNISTDataLoader(data_path).preprocess_data()
+X_train, Y_train, _, _ = MNISTDataLoader(data_path).get_data()
 validation_split = 0.2 # 20% of training data for validation
 split_idx = int(len(X_train) * (1 - validation_split))
 X_train, X_val = X_train[:split_idx], X_train[split_idx:]

@@ -29,7 +29,7 @@ class MNISTDataLoader:
 
         return train_labels, train_images, test_labels, test_images
 
-    def preprocess_data(self):
+    def get_data(self):
         train_labels, train_images, test_labels, test_images = self.load_data(
             f"{self.file_path}/train-labels.idx1-ubyte",
             f"{self.file_path}/train-images.idx3-ubyte",        
