@@ -142,6 +142,9 @@ class CNN:
         # Backprop
         gradient = self.softmax.backprop(gradient, lr)
 
+        # Clip the gradient to prevent exploding gradients
+        np.clip(gradient, -1, 1, out=gradient)
+        
         return loss, acc
 
     def test(self, images, labels):
