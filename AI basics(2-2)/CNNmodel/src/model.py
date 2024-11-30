@@ -2,22 +2,22 @@ import numpy as np
 
 
 class CNN:
-    def __init__(self, tr_x, tr_y, test_x, test_y):
+    def __init__(self, tr_x, tr_y, test_x, test_y, learning_rate=0.1):
         """Initialize the CNN model with training and test data"""
         # Training & Test data
         self.tr_x = tr_x
         self.tr_y = tr_y
         self.test_x = test_x
         self.test_y = test_y
+        self.learning_rate = learning_rate
 
         # Weight & Bias 
-        np.random.seed(5)
-        self.F1 = np.random.rand(10, 3, 3)
-        self.F2 = np.random.rand(10, 10, 3, 3)
-        self.W1 = np.random.rand(10, 196)
-        self.B1 = np.random.rand(10, 1)
-        self.B2 = np.random.rand(10, 1)
-        self.B3 = np.random.rand(10, 1)
+        self.F1 = np.random.rand(10, 3, 3) / 10
+        self.F2 = np.random.rand(10, 10, 3, 3) / 10
+        self.W1 = np.random.rand(10, 196) / 10
+        self.B1 = np.random.rand(10, 1) / 10
+        self.B2 = np.random.rand(10, 1) / 10
+        self.B3 = np.random.rand(10, 1) / 10
 
         # Add parameters property to store trained parameters
         self.parameters = {
@@ -39,8 +39,8 @@ class CNN:
         """Softmax activation, returns 1-D array of values between (0, 1]"""
         input = input.T
         for i in range(10):
-            input[i] = input[i] - input[i].max()
-            input[i] = np.exp(input[i])/np.sum(np.exp(input[i]))
+            input[i] = input[i] - input[i].max()  # Normalize input to prevent overflow
+            input[i] = np.exp(input[i]) / np.sum(np.exp(input[i]))
         return input.T
     
     def one_hot(self, index):
@@ -77,14 +77,10 @@ class CNN:
     
     def im2col(self, filter_len, filter_num, img_size, stride = 1):
         """Transform image into columns for easier matrix multiplication"""
-        #filter_len represents filter size 3 for (3, 3), filter_num represents number of filters which is 10
 
-        #Generate filter [0, ..., filter_len] and repeat for a (filter_len, filter_len) x column
         x_vector = np.tile(np.repeat(np.arange(filter_len) , filter_len), filter_num)
-        #Generate filter [0, ..., filter_len] and tile for a (filter_len, filter_len) y column
         y_vector = np.tile(np.tile(np.arange(filter_len) , filter_len), filter_num)
 
-        #Tile x column img_size*img_size times for whole image
         x_vector = np.tile(x_vector, (int((img_size/stride)*(img_size/stride)), 1))
         #Tile y column img_size*img_size times for whole image
         y_vector = np.tile(y_vector, (int((img_size/stride)*(img_size/stride)), 1))
@@ -129,9 +125,9 @@ class CNN:
         return gradients
 
 
-    def forwardfeed(self, tr_img):
+    def forward(self, tr_img):
         """"Forward propagation of weights and bias"""
-        # 3 building block (Conv + Relu) -> (Conv + Relu + Pooling) -> Softmax
+        # 4 building block (Conv + Relu) -> (Conv + Relu) -> (Conv + Pooling) -> (Softmax)
         
         # Padding from 28x28 to 30x30
         X = tr_img.reshape(784)
@@ -159,13 +155,13 @@ class CNN:
         cur_img = cur_img.reshape(-1, 28, 28)
         A2 = cur_img
 
-        # Mean Pooling, 2x2 stride 2 
+        # building block 3. (Conv + Pooling)
         x_vector, y_vector = self.im2col(2, 1, 28, 2)
         #(10, 196)
         cur_img = np.sum(cur_img[:, x_vector, y_vector], axis = 2)/4.0
 
 
-        # building block 3. (Softmax)
+        # building block 4. (Softmax)
         #(10, 196) * (196, 10) = (10, 10)
         input_1 = cur_img
         output_1 = self.W1.dot(input_1.T) + self.B3
@@ -228,14 +224,15 @@ class CNN:
         
         #Clipping the Gradient
         dW1, dF1, dF2, dB1, dB2, dB3 = self.clip_gradients([dW1, dF1, dF2, dB1, dB2, dB3], 5)
+        lr = self.learning_rate
 
-        self.W1 = np.subtract(self.W1, .7*dW1)
-        self.F2 = np.subtract(self.F2, .7*dF2.reshape(-1, 10, 9).reshape(10, -1, 3, 3))
-        self.F1 = np.subtract(self.F1, .7*dF1.reshape(10, 9).reshape(-1, 3, 3))
+        self.W1 = np.subtract(self.W1, lr*dW1)
+        self.F2 = np.subtract(self.F2, lr*dF2.reshape(-1, 10, 9).reshape(10, -1, 3, 3))
+        self.F1 = np.subtract(self.F1, lr*dF1.reshape(10, 9).reshape(-1, 3, 3))
 
-        self.B3 = np.subtract(self.B3, .7*dB3)
-        self.B2 = np.subtract(self.B2, .7*dB2)
-        self.B1 = np.subtract(self.B1, .7*dB1)
+        self.B3 = np.subtract(self.B3, lr*dB3)
+        self.B2 = np.subtract(self.B2, lr*dB2)
+        self.B1 = np.subtract(self.B1, lr*dB1)
 
         # Update parameters dictionary after backpropagation
         self.parameters = {
@@ -252,13 +249,13 @@ class CNN:
         """Calculate Accuracy of predicted labels with true labels"""
         counter_tr = 0
         for i in range(len(self.tr_y)):
-            X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1  = self.forwardfeed(self.tr_x[i])
+            X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1  = self.forward(self.tr_x[i])
             if np.argmax(np.sum(activate_1, axis=1)) == self.tr_y[i]:
                 counter_tr += 1
 
         counter_te = 0
         for i in range(len(self.test_y)):
-            X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1  = self.forwardfeed(self.test_x[i])
+            X, F1, Z1, A1, F2, Z2, A2, input_1, output_1, activate_1  = self.forward(self.test_x[i])
             if np.argmax(np.sum(activate_1, axis=1)) == self.test_y[i]:
                 counter_te += 1
 
