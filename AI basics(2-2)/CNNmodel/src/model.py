@@ -62,6 +62,7 @@ class Softmax:
 
 
         totals = np.dot(input, self.weights) + self.biases # totals = input * weights + biases
+        totals -= np.max(totals) # Subtract the largest number from totals to prevent overflow
         self.last_totals = totals
 
         exp_a = np.exp(totals)
