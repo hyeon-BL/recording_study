@@ -9,7 +9,7 @@ model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ckpt/ckpt
 
 # Load and preprocess data
 data_loader = MNISTDataLoader(data_path)
-X_train, y_train, X_test, y_test = data_loader.preprocess_data()
+X_train, y_train, X_test, y_test = data_loader.get_data()
 
 # Initialize network
 network = CNN()  # Remove layer_sizes parameter
