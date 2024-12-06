@@ -28,6 +28,7 @@ public:
 
     Complex& operator++(); // prefix 
     Complex operator++(int dummy); // postfix 
+    Complex& operator=(const Complex& c); // = operator overloading
 
 };
 
@@ -93,7 +94,16 @@ Complex Complex::operator ++(int dummy) {
     (*m_r)++;
     return ret;
 }
-
+//= operator overloading
+Complex& Complex ::operator=(const Complex& c) {
+    if (this == &c)
+        return *this;
+    delete m_r;
+    delete m_i;
+    m_r = new int(*c.m_r);
+    m_i = new int(*c.m_i);
+    return *this;
+}
 
 
 
@@ -127,5 +137,15 @@ int main() {
 
     c3 += c2; //c3 = c3 + c2
     c3.print(); // 0 + 1234j
+
+
+    int a = 1; int b = 1111;
+    int c = 2; int d = 2222;
+    int e = 3; int f = 3333;
+
+    Complex c10(a, b); Complex c11(c, d); Complex c12(e, f);
+    (c12 = c11) = c10;      //Expect 1.1111
+
+    c10.print();   c11.print(); c12.print();
     return 0;
 }
