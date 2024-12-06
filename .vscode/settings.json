@@ -3,6 +3,7 @@
     "C_Cpp.default.compilerPath": "c:\\Users\\i4u11\\Desktop\\study\\Career\\recording_study\\OOP(2-2)\\Week1\\HelloWorld.cpp",
     "files.associations": {
         "ostream": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "xstring": "cpp"
     }
 }
