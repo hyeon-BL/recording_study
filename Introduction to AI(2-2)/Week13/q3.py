@@ -34,8 +34,8 @@ def calculate_sse(df):
 def calculate_derivatives(df):
     # Partial derivatives for each parameter
     d_intercept = -1 * (df['OxyCon'] - df['prediction_OxyCon']).sum()
-    d_age = -1 * (df['OxyCon'] - df['prediction_OxyCon'] * df['Age']).sum()
-    d_heart_rate = -1 * (df['OxyCon'] - df['prediction_OxyCon'] * df['Heart Rate']).sum()
+    d_age = -1 * ((df['OxyCon'] - df['prediction_OxyCon']) * df['Age']).sum()
+    d_heart_rate = -1 * ((df['OxyCon'] - df['prediction_OxyCon']) * df['Heart Rate']).sum()
     
     print(f"\nPartial derivatives:")
     print(f"d_intercept: {d_intercept:.4f}")
@@ -63,12 +63,6 @@ print(df[['Age', 'Heart Rate', 'prediction_OxyCon']])
 sse = calculate_sse(df)
 
 print(f"Sum of Squared Errors (SSE): {sse:.4f}")
-
-# Calculate initial predictions and SSE
-df['prediction_OxyCon'] = df.apply(
-    lambda row: oxycon(row['Age'], row['Heart Rate']),
-    axis=1
-)
 
 # Calculate derivatives
 d_w0, d_w1, d_w2 = calculate_derivatives(df)
