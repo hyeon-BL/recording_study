@@ -39,7 +39,7 @@ Student::Student(int id, string name) : m_pId{ new int{id} }, m_name{ name } {
 }
 //Copy Constructor
 Student::Student(const Student& rhs) {
-    this->m_pId = new int(*rhs.m_pId); //Heap allocation and copy.
+    this->m_pId = new int(*rhs.m_pId); //Heap allocation and copy(program runnning)
     this->m_name = rhs.m_name;
     cout << "Copy Constructor" << endl;
     Student::StudentCnt++;
@@ -73,6 +73,10 @@ int main() {
     cout << "s1: " << s1.Get_Name() << " " << s1.Get_ID() << " " << s1.Get_ID_Addr() << endl;
     cout << "s2: " << s2.Get_Name() << " " << s2.Get_ID() << " " << s2.Get_ID_Addr() << endl;
     
+    s2.Set_Name("Bob");
+    cout << "s1: " << s1.Get_Name() << " " << s1.Get_ID() << " " << s1.Get_ID_Addr() << endl;
+    cout << "s2: " << s2.Get_Name() << " " << s2.Get_ID() << " " << s2.Get_ID_Addr() << endl;
+
     // printStudentName(s2);
     printStudentName(&s2);
     cout << "Total students B: " << Student::StudentCnt << endl;
