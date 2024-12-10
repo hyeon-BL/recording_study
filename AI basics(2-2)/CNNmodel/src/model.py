@@ -34,6 +34,17 @@ class Conv3x3:
         # Reshape output to proper dimensions (h-2, w-2, num_filters)
         return output.reshape(h-2, w-2, self.num_filters)
 
+    def backprop(self, d_L_d_out, learn_rate):
+        """Vectorized backpropagation"""
+        d_L_d_out_reshaped = d_L_d_out.reshape(-1, self.num_filters)  # (n_positions, num_filters)
+        
+        # Compute gradient w.r.t. filters
+        d_L_d_filters = np.dot(d_L_d_out_reshaped.T, self.last_input_col)  # (num_filters, 9)
+        d_L_d_filters = d_L_d_filters.reshape(self.num_filters, 3, 3)
+        
+        # Update filters
+        self.filters -= learn_rate * d_L_d_filters
+        return None
 class MaxPool2:
     def forward(self, input):
         """Vectorized forward pass for max pooling"""
@@ -45,6 +56,22 @@ class MaxPool2:
         self.output = np.max(np.max(reshaped, axis=3), axis=1)
         return self.output
 
+    def backprop(self, d_L_d_out):
+        """Vectorized backpropagation for max pooling"""
+        d_L_d_input = np.zeros_like(self.last_input)
+        n_h, n_w, n_c = self.last_input.shape
+        
+
+        # Create mask of where the maximum values were located
+        for c in range(n_c):
+            for i in range(0, n_h, 2):
+                for j in range(0, n_w, 2):
+                    window = self.last_input[i:i+2, j:j+2, c]
+                    max_val = np.max(window)
+                    mask = (window == max_val)
+                    d_L_d_input[i:i+2, j:j+2, c] = mask * d_L_d_out[i//2, j//2, c]
+        
+        return d_L_d_input
 
 class Softmax:
     """Softmax classifier"""
@@ -145,7 +172,9 @@ class CNN:
 
         # Backpropagate gradient
         gradient = self.softmax.backprop(gradient, lr)
-
+        gradient = self.pool.backprop(gradient)
+        self.conv.backprop(gradient, lr)
+        
         # Clip the gradient to prevent exploding gradients
         np.clip(gradient, -1, 1, out=gradient)
 
