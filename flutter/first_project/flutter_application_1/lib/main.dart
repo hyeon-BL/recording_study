@@ -4,7 +4,8 @@ void main() {
   runApp(App());
 }
 
-class App extends StatelessWidget{
+// root widget
+class App extends StatelessWidget{ // StatelessWidget : widget without state
   
   @override
   Widget build(BuildContext context) {
