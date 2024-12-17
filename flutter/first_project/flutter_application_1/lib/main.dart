@@ -11,7 +11,7 @@ class App extends StatelessWidget{ // StatelessWidget : widget without state
   Widget build(BuildContext context) {
     return MaterialApp( // MaterialApp : google app style(recommended), CupertinoApp : apple app style
       home: Scaffold( // Scaffold : main container
-        backgroundColor: Color(0xFF181818), // Color : 0xFF + hex color code
+        backgroundColor: const Color(0xFF181818), // Color : 0xFF + hex color code
         body: Padding(padding: EdgeInsets.symmetric(horizontal: 40), // Padding : padding
           child: Column( // Column : vertical layout
           crossAxisAlignment: CrossAxisAlignment.start, // vertical alignment
