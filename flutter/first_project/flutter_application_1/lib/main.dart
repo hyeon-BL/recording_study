@@ -5,7 +5,9 @@ void main() {
 }
 
 // root widget
-class App extends StatelessWidget{ // StatelessWidget : widget without state
+class App extends StatelessWidget{
+  const App({super.key});
+ // StatelessWidget : widget without state
   
   @override
   Widget build(BuildContext context) {
