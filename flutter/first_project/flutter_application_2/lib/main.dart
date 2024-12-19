@@ -18,7 +18,10 @@ class _MainAppState extends State<MainApp> {
 
   void OnClick() {
     // update the state of the app
-    counter++;
+    setState(() {
+      // data is new, so we need to update the UI(rerun build method)
+      counter++;
+    });
   }
 
   @override
