@@ -14,13 +14,13 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   // store widget data and ui state
-  int counter = 0;
+  List<int> numbers = [];
 
   void OnClick() {
     // update the state of the app
     setState(() {
       // data is new, so we need to update the UI(rerun build method)
-      counter++;
+      numbers.add(numbers.length + 1);
     });
   }
 
@@ -37,10 +37,11 @@ class _MainAppState extends State<MainApp> {
                 'Click Count',
                 style: TextStyle(fontSize: 30),
               ),
-              Text(
-                '$counter',
-                style: TextStyle(fontSize: 30),
-              ),
+              for (var number in numbers)
+                Text(
+                  number.toString(),
+                  style: TextStyle(fontSize: 30),
+                ),
               IconButton(
                   // onPressed is a function that will be called when the button is clicked
                   onPressed: OnClick,
