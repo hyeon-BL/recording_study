@@ -3,7 +3,6 @@ import 'package:flutter_application_3/services/api_service.dart';
 import 'screens/home_screen.dart';
 
 void main() {
-  ApiService().getTodayWebtoons();
   runApp(const MainApp());
 }
 
