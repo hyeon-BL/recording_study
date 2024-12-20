@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  http: ^0.13.5 # automatically added when we imported the package
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
