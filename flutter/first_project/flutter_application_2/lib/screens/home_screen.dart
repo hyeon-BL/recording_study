@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   static const twentyFiveMinutes = 1500;
-  int totalSeconds = 15;
+  int totalSeconds = 1500;
   bool isRunning = false;
   int pomodoros = 0;
   late Timer timer;
@@ -45,6 +45,20 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void reset() {
+    timer.cancel();
+    setState(() {
+      isRunning = false;
+      totalSeconds = twentyFiveMinutes;
+      pomodoros = 0;
+    });
+  }
+
+  String formatTime(int seconds) {
+    var duration = Duration(seconds: seconds);
+    return duration.toString().split(".")[0].substring(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             flex: 1, // ratio of 1:1
             child: Container(
               alignment: Alignment.bottomCenter,
-              child: Text('$totalSeconds',
+              child: Text(formatTime(totalSeconds),
                   style: TextStyle(
                       color: Theme.of(context).cardColor,
                       fontSize: 89,
@@ -64,15 +78,31 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Flexible(
             flex: 3, // ratio of 1:2
-            child: Center(
-              child: IconButton(
-                iconSize: 120,
-                color: Theme.of(context).cardColor,
-                onPressed: isRunning ? onStoppressed : onStartpressed,
-                icon: Icon(isRunning
-                    ? Icons.pause_circle_outline
-                    : Icons.play_circle_outline),
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: IconButton(
+                    iconSize: 120,
+                    color: Theme.of(context).cardColor,
+                    onPressed: isRunning ? onStoppressed : onStartpressed,
+                    icon: Icon(isRunning
+                        ? Icons.pause_circle_outline
+                        : Icons.play_circle_outline),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextButton(
+                  onPressed: reset,
+                  child: Text(
+                    'Reset',
+                    style: TextStyle(
+                        color: Theme.of(context).cardColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ],
             ),
           ),
           Flexible(
