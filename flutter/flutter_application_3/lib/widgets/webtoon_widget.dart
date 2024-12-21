@@ -16,7 +16,7 @@ class Webtoon extends StatelessWidget {
           // 화면 이동(사실은 widget을 stack에 쌓는 것)
           context,
           MaterialPageRoute(
-            // builder를 통해 새로운 화면을 생성
+            // builder를 통해 새로운 화면을 생성, animation 담당
             builder: (context) =>
                 DetailScreen(title: title, thumb: thumb, id: id),
             // fullscreenDialog: true, // 전체 화면 다이얼로그로 설정
