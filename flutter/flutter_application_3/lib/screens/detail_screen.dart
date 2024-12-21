@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_3/models/webtoon.dart';
 import 'package:flutter_application_3/services/api_service.dart';
 import 'package:flutter_application_3/widgets/episode_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailScreen extends StatefulWidget {
   // widget.ㅁ으로 미리 정의된 변수에 접근 가능
@@ -17,13 +18,47 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   late Future<WebtoonDetailModel> webtoonDetail;
   late Future<List<WebtoonEpisodeModel>> webtoonEpisodes;
+  late SharedPreferences prefs;
+  bool isFavorite = false;
   // late -> constructor에서 초기화 불가능한 변수를 나중에 초기화
+  // SharedPreferences -> 앱의 설정 정보를 저장하는 클래스
+
+  Future<void> initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final favoriteWebtoons = prefs.getStringList('favoriteWebtoons');
+    if (favoriteWebtoons != null) {
+      if (favoriteWebtoons.contains(widget.id)) {
+        setState(() {
+          isFavorite = true;
+        });
+      }
+    } else {
+      // favoriteWebtoons가 null일 경우 빈 리스트로 초기화
+      await prefs.setStringList('favoriteWebtoons', []);
+    }
+  }
+
+  onHeartTap() async {
+    final favoriteWebtoons = prefs.getStringList('favoriteWebtoons');
+    if (favoriteWebtoons != null) {
+      if (isFavorite) {
+        favoriteWebtoons.remove(widget.id); // 즐겨찾기에서 제거
+      } else {
+        favoriteWebtoons.add(widget.id); // 즐겨찾기에 추가
+      }
+    }
+    await prefs.setStringList('favoriteWebtoons', favoriteWebtoons ?? []);
+    setState(() {
+      isFavorite = !isFavorite;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     webtoonDetail = ApiService.getWebtoonDetail(widget.id);
     webtoonEpisodes = ApiService.getWebtoonEpisodes(widget.id);
+    initPrefs();
   }
 
   @override
@@ -31,6 +66,12 @@ class _DetailScreenState extends State<DetailScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: onHeartTap,
+            icon: Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+          )
+        ],
         elevation: 1,
         shadowColor: Colors.grey[100],
         backgroundColor: Colors.white,
