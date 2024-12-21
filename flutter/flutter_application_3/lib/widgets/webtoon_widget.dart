@@ -25,26 +25,31 @@ class Webtoon extends StatelessWidget {
       },
       child: Column(
         children: [
-          Container(
-            width: 250,
-            clipBehavior: Clip.hardEdge, // 부모 위젯의 경계를 벗어나지 않도록 설정
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Color.fromRGBO(10, 10, 10, 0.5),
-                  spreadRadius: 1,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Image.network(
-              thumb,
-              headers: const {
-                "User-Agent":
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
-              },
+          Hero(
+            // 화면 이동 시 애니메이션 효과를 주기 위해 사용
+            //(동일한 tag를 가진 위젯끼리 애니메이션 효과를 줌)
+            tag: id,
+            child: Container(
+              width: 250,
+              clipBehavior: Clip.hardEdge, // 부모 위젯의 경계를 벗어나지 않도록 설정
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromRGBO(10, 10, 10, 0.5),
+                    spreadRadius: 1,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Image.network(
+                thumb,
+                headers: const {
+                  "User-Agent":
+                      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+                },
+              ),
             ),
           ),
           SizedBox(height: 10),
