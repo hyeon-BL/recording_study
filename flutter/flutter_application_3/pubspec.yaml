@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
 
   http: ^0.13.5 # automatically added when we imported the package
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
