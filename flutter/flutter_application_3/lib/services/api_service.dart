@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter_application_3/model_model/webtoon.dart';
+import 'package:flutter_application_3/models/webtoon.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -24,6 +24,33 @@ class ApiService {
       return webtoonInstances;
     } else {
       throw Exception('Failed to load webtoons');
+    }
+  }
+
+  static Future<WebtoonDetailModel> getWebtoonDetail(String id) async {
+    final url = Uri.parse('$baseUrl/$id');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> webtoonDetail = jsonDecode(response.body);
+      return WebtoonDetailModel.fromJson(webtoonDetail);
+    } else {
+      throw Exception('Failed to load webtoon detail');
+    }
+  }
+
+  static Future<List<WebtoonEpisodeModel>> getWebtoonEpisodes(String id) async {
+    List<WebtoonEpisodeModel> episodeInstances = [];
+    final url = Uri.parse('$baseUrl/$id/episodes');
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> episodes = jsonDecode(response.body);
+      for (var episode in episodes) {
+        final ep = WebtoonEpisodeModel.fromJson(episode);
+        episodeInstances.add(ep);
+      }
+      return episodeInstances;
+    } else {
+      throw Exception('Failed to load webtoon episodes');
     }
   }
 }
