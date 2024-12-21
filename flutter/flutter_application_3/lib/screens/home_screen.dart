@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
                 return Column(
                   children: [
                     SizedBox(height: 50),
-                    Expanded(child: makeList(snapshot)),
+                    Expanded(child: makeList(snapshot)), // 다루는 데이터 양이 많을 때 사용
                   ],
                 );
               }
