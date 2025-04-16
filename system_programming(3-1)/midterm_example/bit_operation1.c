@@ -13,8 +13,14 @@ int main()
 {
     unsigned short a = 0xF0BD;
     unsigned short b = 0xF0BD;
-    unsigned int result = partial_mul(a, b);
-    printf("Result: %X\n", result);
-    printf("Result: %d\n", result);
+    unsigned short c = 0b1111000010111101;
+    unsigned short d = 0b1111000010111101;
+    unsigned int result_hex = partial_mul(a, b);
+    unsigned int result_bin = partial_mul(c, d);
+    printf("Result: %X\n", result_bin);
+    printf("Result: %d\n", result_bin);
+
+    printf("Result: %X\n", result_hex);
+    printf("Result: %d\n", result_hex);
     return 0;
 }
