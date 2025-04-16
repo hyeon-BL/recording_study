@@ -1,5 +1,11 @@
 #include <stdio.h>
 
+/*
+Setting a flag: x |= (1 << n)(turns the nth bit on).
+Clearing a flag: x &= ~(1 << n) (turns the nth bit off).
+Checking a flag: x & (1 << n) (checks if the nth bit is on).
+*/
+
 int count_ones(unsigned int n)
 {
     unsigned int count = 0;
