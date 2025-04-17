@@ -14,5 +14,7 @@ int main()
     printf("i_max3: %d\n", i_max3);
 
     unsigned int u_max = 0xFFFFFFFF; // 4294967295 in decimal
-    printf("u_max: %u\n", u_max);
+    printf("u_max: %u\n", u_max);    // %u for unsigned int
+    printf("u_max: %d\n", u_max);    // %d for signed int
+    printf("u_max: %x\n", u_max);    // %x for hexadecimal
 }
