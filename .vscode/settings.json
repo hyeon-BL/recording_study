@@ -4,6 +4,7 @@
     "files.associations": {
         "ostream": "cpp",
         "iostream": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "cstdlib": "c"
     }
 }
